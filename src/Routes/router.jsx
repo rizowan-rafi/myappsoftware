@@ -59,14 +59,6 @@ const router = createBrowserRouter([
         element:<BmrCal></BmrCal>
     },
     {
-        path: "/recipees",
-        element: <HealthyRecipesDatabase/>
-    },
-    {
-        path: "/fitness-articles",
-        element: <FitnessArticlesPage/>
-    },
-    {
         path: "/update-profile",
         element: <UpdateProfile></UpdateProfile>
     },
