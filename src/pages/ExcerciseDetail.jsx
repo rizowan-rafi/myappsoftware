@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import Swal from "sweetalert2";
 import NavBar from "../components/NavBar";
-import Swal from 'sweetalert2'
 const ExcerciseDetail = () => {
     const { params } = useParams();
     const [exercise, setExercise] = useState(null);
@@ -71,16 +71,17 @@ const ExcerciseDetail = () => {
         const day = form.querySelector("select").value;
         const sets = form.querySelector("input[placeholder='Sets']").value;
         const reps = form.querySelector("input[placeholder='Reps']").value;
-        const weight = form.querySelector(
+        const weightInput = form.querySelector(
             "input[placeholder='Weight (kg)']"
-        ).value;
+        );
+        const weight = weightInput ? weightInput.value : "0";
         const notes = form.querySelector("textarea").value;
 
-        if (!day || !sets || !reps || !weight) {
+        if (!day || !sets || !reps) {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Please fill in all fields",
+                title: "Please fill in all required fields",
                 showConfirmButton: false,
                 timer: 1500,
             });
@@ -90,7 +91,10 @@ const ExcerciseDetail = () => {
         // Validate numeric fields
         const setsNum = parseInt(sets);
         const repsNum = parseInt(reps);
-        const weightNum = parseFloat(weight);
+        const weightNum =
+            exercise.equipment.toLowerCase() !== "bodyweight"
+                ? parseFloat(weight)
+                : 0;
 
         if (isNaN(setsNum) || setsNum <= 0) {
             Swal.fire({
@@ -106,13 +110,16 @@ const ExcerciseDetail = () => {
             Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Invalid sets",
+                title: "Invalid reps",
                 showConfirmButton: false,
                 timer: 1500,
             });
             return;
         }
-        if (isNaN(weightNum) || weightNum <= 0) {
+        if (
+            exercise.equipment.toLowerCase() !== "bodyweight" &&
+            (isNaN(weightNum) || weightNum <= 0)
+        ) {
             Swal.fire({
                 position: "center",
                 icon: "error",
@@ -261,7 +268,7 @@ const ExcerciseDetail = () => {
                                     </select>
                                 </div>
 
-                                <div className="flex justify-center items-center  gap-2 mt-4">
+                                <div className="flex justify-center items-center gap-2 mt-4">
                                     <input
                                         type="text"
                                         placeholder="Sets"
@@ -272,11 +279,14 @@ const ExcerciseDetail = () => {
                                         placeholder="Reps"
                                         className="input input-bordered w-full max-w-xs"
                                     />
-                                    <input
-                                        type="text"
-                                        placeholder="Weight (kg)"
-                                        className="input input-bordered w-full max-w-xs "
-                                    />
+                                    {exercise.equipment.toLowerCase() !==
+                                        "bodyweight" && (
+                                        <input
+                                            type="text"
+                                            placeholder="Weight (kg)"
+                                            className="input input-bordered w-full max-w-xs"
+                                        />
+                                    )}
                                 </div>
                                 <div>
                                     <textarea

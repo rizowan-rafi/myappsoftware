@@ -1,5 +1,5 @@
-import { Link,useNavigate } from 'react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
 const NavBar = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
@@ -9,14 +9,13 @@ const NavBar = () => {
         if (storedUser) {
             setUser(JSON.parse(storedUser));
         }
-        
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        localStorage.removeItem("user");
         setUser(null);
-        navigate('/login')
-    }
+        navigate("/login");
+    };
     const lists = (
         <>
             <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">
@@ -32,10 +31,10 @@ const NavBar = () => {
                 <Link to={"/fitness-articles"}>Fitness Articles</Link>
             </li>
             <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">
-                <Link to={"/contact"}>Contact Us</Link>
+                <Link to={"/bmr"}>BMI</Link>
             </li>
             <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">
-                <Link to={"/bmr"}>BMR</Link>
+                <Link to={"/contact"}>Contact Us</Link>
             </li>
         </>
     );
@@ -84,31 +83,23 @@ const NavBar = () => {
                             role="button"
                             className="btn btn-ghost btn-circle avatar"
                         >
-                            <div className="w-28 bg-white text-black font-bold flex justify-center  items-center  rounded-full">
-                                {/* <p className="text-center flex justify-center items-center mt-2">
-                                    {user.name[0]}
-                                    {user.name[1]}
-                                </p> */}
-                                <div className="flex flex-col items-center">
-  {user.photo ? (
-    <img
-      src={user.photo}
-      alt={user.name}
-      className="lg:w-40 lg:h-40 w-28 h-28 rounded-full object-cover shadow"
-    />
-  ) : (
-    <p className="lg:w-40 lg:h-40 w-28 h-28 rounded-full bg-white text-black flex justify-center items-center text-4xl font-bold shadow">
-      {user.name[0]}
-      {user.name[1]}
-    </p>
-  )}
+                            <div className="w-10 h-10 bg-white text-black font-bold rounded-full">
+                                <div className="flex items-center justify-center h-full">
+                                    {user.photo ? (
+                                        <img
+                                            src={user.photo}
+                                            alt={user.name}
+                                            className="w-10 h-10 rounded-full object-cover shadow"
+                                        />
+                                    ) : (
+                                        <p className="w-10 h-10 rounded-full bg-white text-black flex justify-center items-center text-sm font-bold shadow">
+                                            {user.name[0]}
+                                            {user.name[1]}
+                                        </p>
+                                    )}
 
-  {/* Below name/initials */}
-  <p className="text-center flex justify-center items-center mt-2 text-lg font-semibold">
-    {user.photo ? user.name : `${user.name[0]}${user.name[1]}`}
-  </p>
-</div>
-
+                                    {/* Below name/initials */}
+                                </div>
                             </div>
                         </div>
                         <ul
@@ -124,17 +115,28 @@ const NavBar = () => {
                                 </Link>
                             </li>
                             <li>
-                                <a>Settings</a>
+                                <Link
+                                    to={"/update-profile"}
+                                    className="justify-between"
+                                >
+                                    Update Profile
+                                </Link>
                             </li>
+
                             <li onClick={handleLogout}>
                                 <a>Logout</a>
                             </li>
                         </ul>
                     </div>
                 ) : (
-                    <Link to={"/login"} className="btn">
-                        Login
-                    </Link>
+                    <div className="space-x-4">
+                        <Link to={"/login"} className="btn">
+                            Login
+                        </Link>
+                        <Link to={"/signup"} className="btn">
+                            SignUp
+                        </Link>
+                    </div>
                 )}
             </div>
         </div>

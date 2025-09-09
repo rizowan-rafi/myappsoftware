@@ -20,7 +20,7 @@ const HealthyRecipesDatabase = () => {
       description: 'Satisfy your sweet tooth with this quick and easy protein mug cake! The perfect healthy indulgence, this fluffy and nutritious, this high-protein mug cake recipe is packed with big flavor without the guilt.',
       time: '5 mins',
       comments: 'comments',
-      image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop'
+      image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop',
     },
     {
       title: 'Easy Chocolate Protein Brownie Recipe',
@@ -123,6 +123,8 @@ const HealthyRecipesDatabase = () => {
         <div className="flex items-center justify-between text-sm text-gray-500">
           <span>⏱ {recipe.time}</span>
           <span>💬 {recipe.comments}</span>
+        </div>
+        <div>
         </div>
       </div>
     </div>

@@ -1,58 +1,61 @@
-import NavBar from "../components/NavBar";
 import { Link, useNavigate } from "react-router";
+import NavBar from "../components/NavBar";
 // import { useNavigate } from "react-router-dom";
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 const SignUp = () => {
-     const navigate = useNavigate();
-const handleSignUp = (e) => {
-    e.preventDefault();
+    const navigate = useNavigate();
+    const handleSignUp = (e) => {
+        e.preventDefault();
 
-    const name = e.target.name.value;
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+        const name = e.target.name.value;
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+        const age = e.target.age.value;
+        const bloodGroup = e.target.bloodGroup.value;
+        const address = e.target.address.value;
 
-    if (password.length < 6) {
-        Swal.fire({
-                   position: "center",
-                   icon: "error",
-                   title: "Password must be have atleast 6 characters",
-                   showConfirmButton: false,
-                   timer: 1500,
-               });
-        return;
-    }
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    const userExists = users.find((user) => user.email === email);
-
-    if (userExists) {
-         Swal.fire({
-             position: "center",
-             icon: "error",
-             title: "User already registered.please use another email",
-             showConfirmButton: false,
-             timer: 1500,
-         });
-        return;
-    }
-
-    const newUser = { name, email, password };
-
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-
-     Swal.fire({
+        if (password.length < 6) {
+            Swal.fire({
                 position: "center",
-                icon: "success",
-                title: "Registration successful.please login",
+                icon: "error",
+                title: "Password must be have atleast 6 characters",
                 showConfirmButton: false,
                 timer: 1500,
             });
+            return;
+        }
 
-    e.target.reset();
-    navigate('/login')
-};
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        const userExists = users.find((user) => user.email === email);
+
+        if (userExists) {
+            Swal.fire({
+                position: "center",
+                icon: "error",
+                title: "User already registered.please use another email",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+            return;
+        }
+
+        const newUser = { name, email, password, age, bloodGroup, address };
+
+        users.push(newUser);
+        localStorage.setItem("users", JSON.stringify(users));
+
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Registration successful.please login",
+            showConfirmButton: false,
+            timer: 1500,
+        });
+
+        e.target.reset();
+        navigate("/login");
+    };
 
     return (
         <div className="min-h-screen">
@@ -86,9 +89,38 @@ const handleSignUp = (e) => {
                                     placeholder="Password"
                                     name="password"
                                 />
+                                <label className="label">Age</label>
+                                <input
+                                    type="number"
+                                    className="input"
+                                    placeholder="Age"
+                                    name="age"
+                                />
+                                <label className="label">Blood Group</label>
+                                <select className="input cursor-pointer select" name="bloodGroup">
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                                <label className="label">Address</label>
+                                <textarea
+                                    className="input pt-2"
+                                    placeholder="Address"
+                                    name="address"
+                                    rows="3"
+                                ></textarea>
                                 <div>
-already have account?
-                                    <Link to={'/login'} className="link link-hover pl-2">
+                                    already have account?
+                                    <Link
+                                        to={"/login"}
+                                        className="link link-hover pl-2"
+                                    >
                                         Login
                                     </Link>
                                 </div>

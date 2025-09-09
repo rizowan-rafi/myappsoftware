@@ -51,7 +51,7 @@ const Exercises = () => {
 
     const handleSelectChange = (e) => { 
         const selectedPart = e.target.value;
-        if (selectedPart === "Sort by bodyPart" || selectedPart === "all exercise") {
+        if (selectedPart === "filter by bodyPart" || selectedPart === "all exercise") {
             setExercises(allexercises);
         } else {
             const filteredExercises = allexercises.filter((exercise) =>
@@ -75,11 +75,11 @@ const Exercises = () => {
                 <section className=" text-white p-10 flex flex-col lg:flex-row gap-3 justify-between items-center mb-5">
                     <div className="">
                         <select
-                            defaultValue="Sort by bodyPart"
+                            defaultValue="filter by bodyPart"
                             className="select select-bordered  w-full max-w-xs mr-5"
                             onChange={handleSelectChange}
                         >
-                            <option disabled={true}>Sort by bodyPart</option>
+                            <option disabled={true}>filter by bodyPart</option>
                             <option value="all exercise">All Exercise</option>
                             {bodyParts.map((part) => (
                                 <option key={part} value={part}>

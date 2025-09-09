@@ -6,16 +6,13 @@ const Profile = () => {
     const [exercise, setExercise] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedExercise, setSelectedExercise] = useState(null);
     const [user, setUser] = useState(null);
-    const [isUploading, setIsUploading] = useState(false);
     const [day, setDay] = useState(
         new Date()
             .toLocaleDateString("en-US", { weekday: "long" })
             .toLowerCase()
     );
-
-    const CLOUD_NAME = "dzywnjyll";
-    const UPLOAD_PRESET = "inventory";
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -85,106 +82,67 @@ const Profile = () => {
             }
         });
     };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const form = e.target;
-        const name = form.querySelector("input[placeholder='name']").value;
-        const sets = form.querySelector("#sets").value;
-        const reps = form.querySelector("#reps").value;
-        const weight = form.querySelector("#weight").value;
+const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
 
-        const notes = form.querySelector("textarea").value;
+    const name = selectedExercise?.name; // from state
+    const sets =
+        form.querySelector("#sets").value.trim() || selectedExercise?.sets;
+    const reps =
+        form.querySelector("#reps").value.trim() || selectedExercise?.reps;
+    let weight = form.querySelector("#weight")?.value.trim() || selectedExercise?.weight;
+    const notes =
+        form.querySelector("textarea").value.trim() || selectedExercise?.notes;
 
-        if (!name || !day || !sets || !reps || !weight) {
-            Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "Please fill in all fields",
-                showConfirmButton: false,
-                timer: 1500,
-            });
-            return;
-        }
-
-        const updatedExercise = {
-            name,
-            day,
-            sets,
-            reps,
-            weight,
-            notes,
-            email: user.email,
-        };
-
-        const storedExercises =
-            JSON.parse(localStorage.getItem("exercises")) || [];
-
-        const updatedList = storedExercises.map((ex) => {
-            if (
-                ex?.name === name &&
-                ex?.day === day &&
-                ex?.email === user.email
-            ) {
-                return updatedExercise;
-            }
-            return ex;
-        });
-
-        localStorage.setItem("exercises", JSON.stringify(updatedList));
-
+    if (!name || !day || !sets || !reps) {
         Swal.fire({
             position: "center",
-            icon: "success",
-            title: "Exercise updated successfully",
+            icon: "error",
+            title: "Please fill in all fields",
             showConfirmButton: false,
             timer: 1500,
         });
-        form.reset();
-        document.getElementById("my_modal_5").close();
+        return;
+    }
+
+    const updatedExercise = {
+        name,
+        day,
+        sets,
+        reps,
+        weight: Number(weight),
+        notes,
+        email: user.email,
     };
 
-    const uploadToCloudinary = async (file) => {
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
-
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      console.log(data);
-      if (data.secure_url) {
-        handleAddPhoto(data.secure_url);
-      } else {
-        console.error("Cloudinary upload failed:", data);
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleAddPhoto = (url) => {
-    const user=JSON.parse(localStorage.getItem("user"));
-    user.photo=url;
-    localStorage.setItem("user", JSON.stringify(user));
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const updatedUsers = users.map((u) => {
-        if (u.email === user.email) {
-            return { ...u, photo: url };
+    // Update exercises list
+    const updatedExercises = (exercise || []).map((ex) => {
+        if (ex?.name === name && ex?.day === day && ex?.email === user.email) {
+            return updatedExercise;
         }
-        return u;
+        return ex;
     });
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    setUser(user);
-  }
+
+    // Update state + localStorage
+    setExercise(updatedExercises);
+    localStorage.setItem("exercises", JSON.stringify(updatedExercises));
+
+    Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Exercise updated successfully",
+        showConfirmButton: false,
+        timer: 1500,
+    });
+
+    form.reset();
+    document.getElementById("my_modal_5").close(); // close new single modal
+    setSelectedExercise(null); // clear selection
+};
+
+
+    // Profile display functions and handlers will go here
 
     // console.log(exercise);
     return (
@@ -192,42 +150,125 @@ const Profile = () => {
             <div>
                 <NavBar></NavBar>
             </div>
-            <div className="flex flex-col gap-7 justify-center items-center h-screen ">
-                <h1 className="lg:text-5xl text-3xl font-bold">Profile Page</h1>
-                {user.photo ? (
-  <img
-    src={user.photo}
-    alt={user.name}
-    className="lg:w-40 lg:h-40 w-28 h-28 rounded-full object-cover shadow"
-  />
-) : (
-  <p className="lg:w-40 lg:h-40 w-28 h-28 rounded-full bg-white text-black flex justify-center items-center text-4xl font-bold shadow">
-    {user.name[0]}
-    {user.name[1]}
-  </p>
-)}
-                <input
-  type="file"
-  disabled={isUploading}
-  onChange={(e) => {
-    const file = e.target.files[0];
-    if (file) {
-      uploadToCloudinary(file);
-    }
-  }}
-  className={` 
-    file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 
-    file:text-sm file:font-medium file:cursor-pointer
-    file:bg-blue-500 file:text-white 
-    hover:file:bg-blue-700 active:file:scale-95
-    disabled:file:bg-gray-300 disabled:file:cursor-not-allowed
-    transition-all duration-300
-    ${isUploading ? "animate-pulse" : ""}
-  `}
-/>
+            <div className="py-8 px-4">
+                <div className="max-w-4xl mx-auto bg-[#1a1a1a] rounded-lg shadow-xl overflow-hidden">
+                    <div className="flex flex-col items-center p-8 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+                        <h1 className="lg:text-5xl text-3xl font-bold mb-6 text-white">
+                            Profile Page
+                        </h1>
+                        <div className="relative">
+                            {user.photo ? (
+                                <img
+                                    src={user.photo}
+                                    alt={user.name}
+                                    className="lg:w-48 lg:h-48 w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
+                                />
+                            ) : (
+                                <div className="lg:w-48 lg:h-48 w-32 h-32 rounded-full bg-white text-black flex justify-center items-center text-5xl font-bold border-4 border-white shadow-lg">
+                                    {user.name[0]}
+                                    {user.name[1]}
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
-                <p className="text-xl font-semibold">Name: {user.name}</p>
-                <p className="text-xl font-semibold">Email: {user.email}</p>
+                    <div className="p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <div className="flex items-center space-x-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6 text-gray-600"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                        />
+                                    </svg>
+                                    <p className="text-xl">
+                                        <span className="font-semibold">
+                                            Name:
+                                        </span>{" "}
+                                        {user.name}
+                                    </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6 text-gray-600"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                        />
+                                    </svg>
+                                    <p className="text-xl">
+                                        <span className="font-semibold">
+                                            Email:
+                                        </span>{" "}
+                                        {user.email}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex items-center space-x-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6 text-gray-600"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                        />
+                                    </svg>
+                                    <p className="text-xl">
+                                        <span className="font-semibold">
+                                            Age:
+                                        </span>{" "}
+                                        {user.age || "Not specified"}
+                                    </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-6 w-6 text-gray-600"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                                        />
+                                    </svg>
+                                    <p className="text-xl">
+                                        <span className="font-semibold">
+                                            Blood Group:
+                                        </span>{" "}
+                                        {user.bloodGroup || "Not specified"}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className="flex justify-center items-center mb-10">
@@ -281,7 +322,12 @@ const Profile = () => {
                                             </h2>
                                             <p>Sets: {ex.sets}</p>
                                             <p>Reps: {ex.reps}</p>
-                                            <p>Weight: {ex.weight} kg</p>
+                                            {ex?.weight === 0 ? (
+                                                <></>
+                                            ) : (
+                                                <p>Weight: {ex.weight} kg</p>
+                                            )}
+
                                             <p>Notes: {ex.notes}</p>
                                             <div className="mt-4 space-x-3 space-y-2 lg:space-y-0">
                                                 <Link
@@ -292,11 +338,12 @@ const Profile = () => {
                                                 </Link>
                                                 <button
                                                     onClick={() => {
+                                                        setSelectedExercise(ex); // set current exercise
                                                         document
                                                             .getElementById(
                                                                 "my_modal_5"
                                                             )
-                                                            .showModal();
+                                                            .showModal(); // open modal
                                                     }}
                                                     className="btn"
                                                 >
@@ -319,61 +366,66 @@ const Profile = () => {
                                                 className="modal modal-bottom sm:modal-middle"
                                             >
                                                 <div className="modal-box text-white">
-                                                    <h3 className="font-bold text-lg">
-                                                        {ex.name}
-                                                    </h3>
-                                                    <p className="py-4">
-                                                        Press ESC key or click
-                                                        the button below to
-                                                        close
-                                                    </p>
-                                                    <form
-                                                        action=""
-                                                        onSubmit={handleSubmit}
-                                                        className="flex flex-col"
-                                                    >
-                                                        <div className="flex justify-center items-center  gap-2 mt-4">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="name"
-                                                                className="input input-bordered w-full max-w-xs"
-                                                                readOnly
-                                                                value={`${ex.name}`}
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                placeholder={`${ex.sets} sets`}
-                                                                id="sets"
-                                                                className="input input-bordered w-full max-w-xs"
-                                                            />
-
-                                                            <input
-                                                                type="text"
-                                                                placeholder={`${ex.reps} reps`}
-                                                                id="reps"
-                                                                className="input input-bordered w-full max-w-xs"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                placeholder={`${ex.weight} kg`}
-                                                                id="weight"
-                                                                className="input input-bordered w-full max-w-xs "
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <textarea
-                                                                className="textarea w-full resize-none textarea-bordered mt-4"
-                                                                placeholder="Notes"
-                                                                rows="4"
-                                                                defaultValue={
-                                                                    ex.notes
+                                                    {selectedExercise && (
+                                                        <>
+                                                            <h3 className="font-bold text-lg">
+                                                                {
+                                                                    selectedExercise.name
                                                                 }
-                                                            ></textarea>
-                                                        </div>
-                                                        <button className="btn btn-primary bg-black text-white mt-4">
-                                                            Update
-                                                        </button>
-                                                    </form>
+                                                            </h3>
+                                                            <form
+                                                                onSubmit={
+                                                                    handleSubmit
+                                                                }
+                                                                className="flex flex-col"
+                                                            >
+                                                                <div className="flex justify-center items-center gap-2 mt-4">
+                                                                    <input
+                                                                        type="text"
+                                                                        readOnly
+                                                                        value={
+                                                                            selectedExercise.name
+                                                                        }
+                                                                        className="input input-bordered w-full max-w-xs"
+                                                                    />
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder={`${selectedExercise.sets} sets`}
+                                                                        id="sets"
+                                                                        className="input input-bordered w-full max-w-xs"
+                                                                    />
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder={`${selectedExercise.reps} reps`}
+                                                                        id="reps"
+                                                                        className="input input-bordered w-full max-w-xs"
+                                                                    />
+                                                                    {selectedExercise.weight !==
+                                                                        0 && (
+                                                                        <input
+                                                                            type="text"
+                                                                            placeholder={`${selectedExercise.weight} kg`}
+                                                                            id="weight"
+                                                                            className="input input-bordered w-full max-w-xs"
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                                <div>
+                                                                    <textarea
+                                                                        className="textarea w-full resize-none textarea-bordered mt-4"
+                                                                        placeholder="Notes"
+                                                                        rows="4"
+                                                                        defaultValue={
+                                                                            selectedExercise.notes
+                                                                        }
+                                                                    ></textarea>
+                                                                </div>
+                                                                <button className="btn btn-primary bg-black text-white mt-4">
+                                                                    Update
+                                                                </button>
+                                                            </form>
+                                                        </>
+                                                    )}
                                                     <div className="modal-action">
                                                         <form method="dialog">
                                                             <button className="btn">

@@ -11,6 +11,7 @@ import ContactUs from '../pages/ContactUs';
 import BmrCal from '../pages/BmrCal';
 import HealthyRecipesDatabase from '../pages/Recipees';
 import FitnessArticlesPage from '../pages/FitnessArticle';
+import UpdateProfile from '../pages/UpdateProfile';
 
 const router = createBrowserRouter([
     {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
     {
         path: "/fitness-articles",
         element: <FitnessArticlesPage/>
+    },
+    {
+        path: "/update-profile",
+        element: <UpdateProfile></UpdateProfile>
     },
 ]);
 
