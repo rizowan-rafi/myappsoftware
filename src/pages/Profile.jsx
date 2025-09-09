@@ -7,11 +7,16 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
     const [day, setDay] = useState(
         new Date()
             .toLocaleDateString("en-US", { weekday: "long" })
             .toLowerCase()
     );
+
+    const CLOUD_NAME = "dzywnjyll";
+    const UPLOAD_PRESET = "inventory";
+
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -138,6 +143,49 @@ const Profile = () => {
         document.getElementById("my_modal_5").close();
     };
 
+    const uploadToCloudinary = async (file) => {
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      console.log(data);
+      if (data.secure_url) {
+        handleAddPhoto(data.secure_url);
+      } else {
+        console.error("Cloudinary upload failed:", data);
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAddPhoto = (url) => {
+    const user=JSON.parse(localStorage.getItem("user"));
+    user.photo=url;
+    localStorage.setItem("user", JSON.stringify(user));
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const updatedUsers = users.map((u) => {
+        if (u.email === user.email) {
+            return { ...u, photo: url };
+        }
+        return u;
+    });
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    setUser(user);
+  }
+
     // console.log(exercise);
     return (
         <div>
@@ -146,10 +194,38 @@ const Profile = () => {
             </div>
             <div className="flex flex-col gap-7 justify-center items-center h-screen ">
                 <h1 className="lg:text-5xl text-3xl font-bold">Profile Page</h1>
-                <p className="lg:w-40 lg:h-40 w-28 h-28 rounded-full bg-white text-black flex justify-center items-center text-4xl font-bold">
-                    {user.name[0]}
-                    {user.name[1]}
-                </p>
+                {user.photo ? (
+  <img
+    src={user.photo}
+    alt={user.name}
+    className="lg:w-40 lg:h-40 w-28 h-28 rounded-full object-cover shadow"
+  />
+) : (
+  <p className="lg:w-40 lg:h-40 w-28 h-28 rounded-full bg-white text-black flex justify-center items-center text-4xl font-bold shadow">
+    {user.name[0]}
+    {user.name[1]}
+  </p>
+)}
+                <input
+  type="file"
+  disabled={isUploading}
+  onChange={(e) => {
+    const file = e.target.files[0];
+    if (file) {
+      uploadToCloudinary(file);
+    }
+  }}
+  className={` 
+    file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 
+    file:text-sm file:font-medium file:cursor-pointer
+    file:bg-blue-500 file:text-white 
+    hover:file:bg-blue-700 active:file:scale-95
+    disabled:file:bg-gray-300 disabled:file:cursor-not-allowed
+    transition-all duration-300
+    ${isUploading ? "animate-pulse" : ""}
+  `}
+/>
+
                 <p className="text-xl font-semibold">Name: {user.name}</p>
                 <p className="text-xl font-semibold">Email: {user.email}</p>
             </div>

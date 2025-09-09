@@ -79,10 +79,30 @@ const NavBar = () => {
                             className="btn btn-ghost btn-circle avatar"
                         >
                             <div className="w-28 bg-white text-black font-bold flex justify-center  items-center  rounded-full">
-                                <p className="text-center flex justify-center items-center mt-2">
+                                {/* <p className="text-center flex justify-center items-center mt-2">
                                     {user.name[0]}
                                     {user.name[1]}
-                                </p>
+                                </p> */}
+                                <div className="flex flex-col items-center">
+  {user.photo ? (
+    <img
+      src={user.photo}
+      alt={user.name}
+      className="lg:w-40 lg:h-40 w-28 h-28 rounded-full object-cover shadow"
+    />
+  ) : (
+    <p className="lg:w-40 lg:h-40 w-28 h-28 rounded-full bg-white text-black flex justify-center items-center text-4xl font-bold shadow">
+      {user.name[0]}
+      {user.name[1]}
+    </p>
+  )}
+
+  {/* Below name/initials */}
+  <p className="text-center flex justify-center items-center mt-2 text-lg font-semibold">
+    {user.photo ? user.name : `${user.name[0]}${user.name[1]}`}
+  </p>
+</div>
+
                             </div>
                         </div>
                         <ul
