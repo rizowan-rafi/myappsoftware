@@ -26,6 +26,12 @@ const NavBar = () => {
                 <Link to={"/exercise"}>Exercises</Link>
             </li>
             <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">
+                <Link to={"/recipees"}>Recipes</Link>
+            </li>
+            <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">
+                <Link to={"/fitness-articles"}>Fitness Articles</Link>
+            </li>
+            <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">
                 <Link to={"/contact"}>Contact Us</Link>
             </li>
             <li className="hover:bg-white hover:text-black hover:rounded-lg hover:font-semibold">

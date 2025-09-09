@@ -9,6 +9,8 @@ import SignUp from '../pages/SignUp';
 import ProtectedRoute from './ProtectedRoute';
 import ContactUs from '../pages/ContactUs';
 import BmrCal from '../pages/BmrCal';
+import HealthyRecipesDatabase from '../pages/Recipees';
+import FitnessArticlesPage from '../pages/FitnessArticle';
 
 const router = createBrowserRouter([
     {
@@ -54,6 +56,14 @@ const router = createBrowserRouter([
     {
         path: "/bmr",
         element:<BmrCal></BmrCal>
+    },
+    {
+        path: "/recipees",
+        element: <HealthyRecipesDatabase/>
+    },
+    {
+        path: "/fitness-articles",
+        element: <FitnessArticlesPage/>
     },
 ]);
 
