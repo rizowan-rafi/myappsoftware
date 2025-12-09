@@ -15,7 +15,7 @@ const FitnessArticlesPage = () => {
           <div className="relative z-20 text-center px-4">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Articles & Guides</h1>
             <p className="text-lg md:text-xl mb-12 max-w-3xl mx-auto leading-relaxed">
-              Learn how to build muscle, burn fat and stay motivated. These guides<br />
+              Learn how to build muscle and lose fat, burn fat and stay motivated. These guides<br />
               will teach you how to reach your health and fitness goals.
             </p>
             
