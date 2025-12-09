@@ -301,7 +301,7 @@ const ExcerciseDetail = () => {
                             </form>
                             <div className="modal-action">
                                 <form method="dialog">
-                                    <button className="btn">Close</button>
+                                    <button className="btn">Close the modal</button>
                                 </form>
                             </div>
                         </div>

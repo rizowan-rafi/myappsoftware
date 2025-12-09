@@ -154,7 +154,7 @@ const handleSubmit = (e) => {
                 <div className="max-w-4xl mx-auto bg-[#1a1a1a] rounded-lg shadow-xl overflow-hidden">
                     <div className="flex flex-col items-center p-8 bg-gradient-to-r from-gray-900 to-gray-800 text-white">
                         <h1 className="lg:text-5xl text-3xl font-bold mb-6 text-white">
-                            Profile Page
+                            Profile Page.
                         </h1>
                         <div className="relative">
                             {user.photo ? (
